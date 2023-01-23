@@ -1,0 +1,13 @@
+## Interface: 100002
+## Title: Mercator
+## Notes: Trading and crafting data and calculation
+## SavedVariables: MercatorDB
+
+main.lua
+misc.lua
+data.lua
+characterscan.lua
+auctionscan.lua
+itemcache.lua
+tooltip.lua
+init.lua
