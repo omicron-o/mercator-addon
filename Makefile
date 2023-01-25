@@ -1,0 +1,25 @@
+.PHONY: all build clean release release-zip release-tar
+
+BUILD_DIR := ./build
+RELEASE_DIR := ./release
+SRC_DIR := ./src
+
+all: release-zip release-tar
+	
+
+release: build
+	mkdir -p $(RELEASE_DIR)
+
+build: clean
+	mkdir -p $(BUILD_DIR)
+	cp -r $(SRC_DIR) $(BUILD_DIR)/Mercator
+	cp LICENSE.md $(BUILD_DIR)/Mercator/
+
+release-zip: release
+	7z a -tzip $(RELEASE_DIR)/release.zip -w $(BUILD_DIR)/.
+
+release-tar: release
+	tar -cJf $(RELEASE_DIR)/release.tar.xz -C $(BUILD_DIR) Mercator
+
+clean:
+	rm -rf $(BUILD_DIR) $(RELEASE_DIR)
