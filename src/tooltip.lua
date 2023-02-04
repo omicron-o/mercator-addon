@@ -42,12 +42,27 @@ function merc.AddTooltipItemId(tooltip, itemid)
         tooltip:AddDoubleLine("id", tostring(itemid), nil, nil, nil, 1, 1, 1)
 end
 
+function merc.AddTooltipItemCounts(tooltip, itemid)
+    local counts = merc.GetItemCountPerCharacter(itemid)
+    local total = 0
+    for character, count in pairs(counts) do
+        total = total + count
+    end
+
+    tooltip:AddDoubleLine("All characters", tostring(total), nil, nil, nil, 1, 1, 1)
+    for character, count in pairs(counts) do
+        tooltip:AddDoubleLine(character, tostring(count), 1, 1, 1, 1, 1, 1)
+    end
+end
+
 function merc.OnTooltipSetItem(tooltip, data)
     if tooltip == GameTooltip then
         merc.AddTooltipPriceData(tooltip, data.id)
+        merc.AddTooltipItemCounts(tooltip, data.id)
         merc.AddTooltipItemId(tooltip, data.id)
     end
 end
+
 
 -- Replace 'Enum.TooltipDataType.Item' with an appropriate type for the tooltip
 -- data you are wanting to process; eg. use 'Enum.TooltipDataType.Spell' for

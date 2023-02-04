@@ -77,20 +77,6 @@ function merc.CreateDB()
     return {version = 1, characters={}}
 end
 
--- Add a new character to the stored data
-function merc.InitCharacterDB(name)
-    if merc.db.characters[name] == nil then
-        merc.db.characters[name] = {
-            version = 1,
-            characters={},
-            prices={
-                recent={},
-                history={}
-            }
-        }
-    end
-end
-
 -- Apply data updates
 function merc.UpdateDB()
     if merc.db["characters"] == nil then
@@ -198,4 +184,60 @@ function merc.AddPriceHistory(itemid, means, time, from)
     end
 
     table.insert(item, {time=time, from=from, means=means})
+end
+
+local function GetCharacterDB()
+    local name, server = UnitFullName("player")
+    local character = string.format("%s-%s", name, server)
+    if merc.db.characters[character] == nil then
+        merc.db.characters[character] = {
+            inventory = {},
+            bank = {},
+            reagents = {}
+        }
+    end
+
+    local chardb = merc.db.characters[character]
+    if chardb.inventory == nil then
+        chardb.inventory = {}
+    end
+    if chardb.bank == nil then
+        chardb.bank = {}
+    end
+    return chardb
+end
+
+function merc.UpdateCharacterInventory(items)
+    local charDB = GetCharacterDB()
+    if items ~= nil then
+        charDB.inventory = items
+    end
+end
+
+function merc.UpdateCharacterBank(items)
+    local charDB = GetCharacterDB()
+    if items ~= nil then
+        charDB.bank = items
+    end
+end
+
+function merc.GetItemCountPerCharacter(itemId)
+    local counts = {}
+    local itemIdStr = tostring(itemId)
+    for character, chardb in pairs(merc.db.characters) do
+        counts[character] = 0
+        if chardb.inventory[itemIdStr] ~= nil then
+            counts[character] = counts[character] + chardb.inventory[itemIdStr]
+        end
+        if chardb.bank[itemIdStr] ~= nil then
+            counts[character] = counts[character] + chardb.bank[itemIdStr]
+        end
+        if chardb.reagents[itemIdStr] ~= nil then
+            counts[character] = counts[character] + chardb.reagents[itemIdStr]
+        end
+        if counts[character] == 0 then
+            counts[character] = nil
+        end
+    end
+    return counts
 end
