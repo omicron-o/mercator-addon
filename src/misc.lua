@@ -44,7 +44,7 @@ function merc.FormatDuration(t)
     elseif t < 86400 then
         return string.format("%dh ago", math.floor(t / 3600))
     elseif t < 604800 then
-        return string.format("%dh ago", math.floor(t / 86400))
+        return string.format("%dd ago", math.floor(t / 86400))
     else
         return "long ago"
     end
