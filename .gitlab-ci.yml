@@ -1,0 +1,44 @@
+stages:
+  - package
+  - release
+
+package:
+  stage: package
+  rules:
+    - if: $CI_COMMIT_TAG
+  image: alpine:3
+  before_script:
+    - echo PACKAGE_JOB_ID=$CI_JOB_ID >> package.env
+    - apk add xz 7zip make
+  script:
+    - make
+  artifacts:
+    expire_in: never
+    paths:
+      - release/mercator.zip
+      - release/mercator.tar.gz
+      - release/mercator.tar.xz
+    reports:
+      dotenv: package.env
+
+release:
+  stage: release
+  rules:
+    - if: $CI_COMMIT_TAG
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script:
+    - echo 'Creating release'
+  needs:
+    - job: package
+      artifacts: true
+  release:
+    tag_name: $CI_COMMIT_TAG
+    name: 'Mercator $CI_COMMIT_TAG'
+    assets:
+      links:
+        - name: 'Mercator Addon (zip archive)'
+          url: 'https://gitlab.com/mercator-wow/addon/-/jobs/${PACKAGE_JOB_ID}/artifacts/file/release/mercator-addon.tar.gz'
+        - name: 'Mercator Addon (tar.xz archive)'
+          url: 'https://gitlab.com/mercator-wow/addon/-/jobs/${PACKAGE_JOB_ID}/artifacts/file/release/mercator-addon.tar.xz'
+        - name: 'Mercator Addon (tar.gz archive)'
+          url: 'https://gitlab.com/mercator-wow/addon/-/jobs/${PACKAGE_JOB_ID}/artifacts/file/release/mercator-addon.tar.gz'
