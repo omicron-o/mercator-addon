@@ -34,6 +34,7 @@ release:
   release:
     tag_name: $CI_COMMIT_TAG
     name: 'Mercator $CI_COMMIT_TAG'
+    description: 'Mercator $CI_COMMIT_TAG'
     assets:
       links:
         - name: 'Mercator Addon (zip archive)'
