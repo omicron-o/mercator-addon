@@ -16,10 +16,11 @@ build: clean
 	cp LICENSE.md $(BUILD_DIR)/Mercator/
 
 release-zip: release
-	7z a -tzip $(RELEASE_DIR)/release.zip -w $(BUILD_DIR)/.
+	7z a -tzip $(RELEASE_DIR)/mercator.zip -w $(BUILD_DIR)/.
 
 release-tar: release
-	tar -cJf $(RELEASE_DIR)/release.tar.xz -C $(BUILD_DIR) Mercator
+	tar -cJf $(RELEASE_DIR)/mercator.tar.xz -C $(BUILD_DIR) Mercator
+	tar -czf $(RELEASE_DIR)/mercator.tar.gz -C $(BUILD_DIR) Mercator
 
 clean:
 	rm -rf $(BUILD_DIR) $(RELEASE_DIR)
