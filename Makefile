@@ -3,6 +3,7 @@
 BUILD_DIR := ./build
 RELEASE_DIR := ./release
 SRC_DIR := ./src
+TEXTURE_DIR := ./textures
 
 all: release-zip release-tar
 	
@@ -13,6 +14,8 @@ release: build
 build: clean
 	mkdir -p $(BUILD_DIR)
 	cp -r $(SRC_DIR) $(BUILD_DIR)/Mercator
+	mkdir -p $(BUILD_DIR)/Mercator/textures
+	cp -r $(TEXTURE_DIR)/*.tga $(BUILD_DIR)/Mercator/textures
 	cp LICENSE.md $(BUILD_DIR)/Mercator/
 
 release-zip: release
