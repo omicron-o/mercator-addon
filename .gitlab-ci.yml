@@ -38,8 +38,8 @@ release:
     assets:
       links:
         - name: 'Mercator Addon (zip archive)'
-          url: 'https://gitlab.com/mercator-wow/addon/-/jobs/${PACKAGE_JOB_ID}/artifacts/file/release/mercator-addon.zip'
+          url: 'https://gitlab.com/mercator-wow/mercator/-/jobs/${PACKAGE_JOB_ID}/artifacts/raw/release/mercator.zip'
         - name: 'Mercator Addon (tar.xz archive)'
-          url: 'https://gitlab.com/mercator-wow/addon/-/jobs/${PACKAGE_JOB_ID}/artifacts/file/release/mercator-addon.tar.xz'
+          url: 'https://gitlab.com/mercator-wow/mercator/-/jobs/${PACKAGE_JOB_ID}/artifacts/raw/release/mercator.tar.xz'
         - name: 'Mercator Addon (tar.gz archive)'
-          url: 'https://gitlab.com/mercator-wow/addon/-/jobs/${PACKAGE_JOB_ID}/artifacts/file/release/mercator-addon.tar.gz'
+          url: 'https://gitlab.com/mercator-wow/mercator/-/jobs/${PACKAGE_JOB_ID}/artifacts/raw/release/mercator.tar.gz'
