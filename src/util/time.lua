@@ -13,13 +13,18 @@
 --
 -- You should have received a copy of the GNU General Public License along with
 -- Mercator. If not, see <https://www.gnu.org/licenses/>. 
-local merc = select(2, ...)
+local mercator = select(2, ...)
+if mercator.util == nil then
+    mercator.util = {}
+end
+mercator.util.time = {}
+local time = mercator.util.time
 
 --[[
 local short_durations = {"s", "m", "h", "d", "w", "M", "Y"}
 local long_durations = {"seconds", "minutes", "hours", "days", "weeks", "months", "years"}
 
-function merc.FormatDuration(t)
+function mercator.FormatDuration(t)
     if t < 60 then
         return string.format("%ds", math.floor(t / 60))
     elseif t < 3600 then
@@ -36,7 +41,7 @@ function merc.FormatDuration(t)
 end
 ]]--
 
-function merc.FormatDuration(t)
+function time.FormatDuration(t)
     if t < 60 then
         return "now"
     elseif t < 3600 then

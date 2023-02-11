@@ -15,18 +15,19 @@
 -- Mercator. If not, see <https://www.gnu.org/licenses/>. 
 local AddonName, merc = ...
 local data = merc.data
+local time = merc.util.time
 
 function merc.AddTooltipPriceData(tooltip, itemid)
     local now = GetServerTime()
-    local means, from, time = data.GetRecentPrice(itemid)
+    local means, from, ts = data.GetRecentPrice(itemid)
     if not means then
         return
     end
     
-    local age = now - time
+    local age = now - ts
 
     tooltip:AddLine()
-    tooltip:AddDoubleLine("Recent mean prices", merc.FormatDuration(age))
+    tooltip:AddDoubleLine("Recent mean prices", time.FormatDuration(age))
     local quantities = {"1", "10", "100", "1000"}
     for _, qty in ipairs(quantities) do
         local mean = means[qty]
@@ -73,4 +74,3 @@ end
 -- the enum with 'TooltipDataProcessor.AllTypes' (or the string "ALL").
 
 TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, merc.OnTooltipSetItem)
-
