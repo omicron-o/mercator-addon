@@ -59,10 +59,10 @@ function merc.OnAddonLoaded(name)
         return
     end
     if MercatorDB == nil then
-        MercatorDB = merc.CreateDB()
+        MercatorDB = merc.data.CreateDB()
     end
     merc.db = MercatorDB
-    merc.UpdateDB()
+    merc.data.UpdateDB()
     print("Loaded", AddonName)
 end
 merc.SetEventHandler("ADDON_LOADED", merc.OnAddonLoaded)

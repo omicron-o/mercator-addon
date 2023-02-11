@@ -14,10 +14,11 @@
 -- You should have received a copy of the GNU General Public License along with
 -- Mercator. If not, see <https://www.gnu.org/licenses/>. 
 local AddonName, merc = ...
+local data = merc.data
 
 function merc.AddTooltipPriceData(tooltip, itemid)
     local now = GetServerTime()
-    local means, from, time = merc.GetRecentPrice(itemid)
+    local means, from, time = data.GetRecentPrice(itemid)
     if not means then
         return
     end
@@ -43,7 +44,7 @@ function merc.AddTooltipItemId(tooltip, itemid)
 end
 
 function merc.AddTooltipItemCounts(tooltip, itemid)
-    local counts = merc.GetItemCountPerCharacter(itemid)
+    local counts = data.GetItemCountPerCharacter(itemid)
     local total = 0
     for character, count in pairs(counts) do
         total = total + count

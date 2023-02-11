@@ -14,7 +14,8 @@
 -- You should have received a copy of the GNU General Public License along with
 -- Mercator. If not, see <https://www.gnu.org/licenses/>. 
 local merc = select(2, ...)
-
+merc.data = {}
+local data = merc.data
 
 -- Addon data structure:
 -- =====================
@@ -73,12 +74,12 @@ local merc = select(2, ...)
 -- will contain mean values for 1, 10, 100, 500, 1000, 5000 and 10000 quantity.
 -- Some of these may be nil.
 
-function merc.CreateDB()
+function data.CreateDB()
     return {version = 1, characters={}}
 end
 
 -- Apply data updates
-function merc.UpdateDB()
+function data.UpdateDB()
     if merc.db["characters"] == nil then
         merc.db.characters = {}
     end
@@ -111,7 +112,7 @@ end
 --
 -- This function will take (read only) ownership of the passed means table and
 -- it should never be modified again.
-function merc.UpdateRecentPrice(itemid, means, time, from)
+function data.UpdateRecentPrice(itemid, means, time, from)
     if from == nil then
         local name, server = UnitFullName("player")
         from = string.format("%s-%s", name, server)
@@ -132,7 +133,7 @@ function merc.UpdateRecentPrice(itemid, means, time, from)
 end
 
 -- Returns means(table), from(str), time(number)
-function merc.GetRecentPrice(itemid)
+function data.GetRecentPrice(itemid)
     local data = merc.db.prices.recent[tostring(itemid)]
     if data then
         return data.means, data.from, data.time
@@ -156,7 +157,7 @@ end
 --
 -- QUIRK: When DST changes backwards you won't be able to add entries for 1
 -- hour.
-function merc.AddPriceHistory(itemid, means, time, from)
+function data.AddPriceHistory(itemid, means, time, from)
     if from == nil then
         local name, server = UnitFullName("player")
         from = string.format("%s-%s", name, server)
@@ -186,45 +187,52 @@ function merc.AddPriceHistory(itemid, means, time, from)
     table.insert(item, {time=time, from=from, means=means})
 end
 
-local function GetCharacterDB()
-    local name, server = UnitFullName("player")
-    local character = string.format("%s-%s", name, server)
-    if merc.db.characters[character] == nil then
-        merc.db.characters[character] = {
-            inventory = {},
-            bank = {},
-            reagents = {}
-        }
-    end
-
-    local chardb = merc.db.characters[character]
+-- Makes sure that all structure that is expected is in a character db. Creates
+-- it if it isn't there. This is necessary if the structure changes with addon
+-- versions
+local function EnsureCharacterDBStructure(chardb)
     if chardb.inventory == nil then
         chardb.inventory = {}
     end
     if chardb.bank == nil then
         chardb.bank = {}
     end
+    if chardb.copper == nil then
+        chardb.copper = {}
+    end
+end
+
+-- Grabs the database for this character based on charactername
+local function GetCharacterDB()
+    local name, server = UnitFullName("player")
+    local character = string.format("%s-%s", name, server)
+    if merc.db.characters[character] == nil then
+        merc.db.characters[character] = {}
+    end
+    local chardb = merc.db.characters[character]
+    EnsureCharacterDBStructure(chardb)
     return chardb
 end
 
-function merc.UpdateCharacterInventory(items)
+function data.UpdateCharacterInventory(items)
     local charDB = GetCharacterDB()
     if items ~= nil then
         charDB.inventory = items
     end
 end
 
-function merc.UpdateCharacterBank(items)
+function data.UpdateCharacterBank(items)
     local charDB = GetCharacterDB()
     if items ~= nil then
         charDB.bank = items
     end
 end
 
-function merc.GetItemCountPerCharacter(itemId)
+function data.GetItemCountPerCharacter(itemId)
     local counts = {}
     local itemIdStr = tostring(itemId)
     for character, chardb in pairs(merc.db.characters) do
+        EnsureCharacterDBStructure(chardb)
         counts[character] = 0
         if chardb.inventory[itemIdStr] ~= nil then
             counts[character] = counts[character] + chardb.inventory[itemIdStr]
@@ -240,4 +248,35 @@ function merc.GetItemCountPerCharacter(itemId)
         end
     end
     return counts
+end
+
+
+-- Saves a new gold value for the current character.
+-- If the most recent entry is less than 15 minutes old it gets updated instead.
+function data.AddCharacterCopperHistory(copper)
+    local charDB = GetCharacterDB()
+    local now = GetServerTime()
+    local latest = charDB.copper[#charDB.copper]
+    assert(latest == nil or now >= latest.ts, "Current time is older than most recent time")
+
+    if latest == nil or (now - latest.ts) > 900 then
+        table.insert(charDB.copper, {
+            ["ts"] = now,
+            ["copper"] = copper
+        })
+    else
+        latest.copper = copper
+    end
+end
+
+-- Return a table with the most recent copper values for each character
+function data.GetCopperPerCharacter()
+    local copper = {}
+    for character, chardb in pairs(merc.db.characters) do
+        EnsureCharacterDBStructure(chardb)
+        if #chardb.copper >= 1 then
+            copper[character] = chardb.copper[#chardb.copper].copper
+        end
+    end
+    return copper
 end

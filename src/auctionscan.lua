@@ -14,6 +14,7 @@
 -- You should have received a copy of the GNU General Public License along with
 -- Mercator. If not, see <https://www.gnu.org/licenses/>. 
 local merc = select(2, ...)
+local data = merc.data
 
 -- Scan flow:
 -- 1. Make a list of all the items we want to scan
@@ -176,7 +177,7 @@ function merc.CommodityResultsEvent(itemId)
     -- Calculate the desired mean values, and update the recent & historic
     -- prices
     local means = merc.ProcessPriceResults(results)
-    merc.UpdateRecentPrice(itemId, means)
-    merc.AddPriceHistory(itemId, means)
+    data.UpdateRecentPrice(itemId, means)
+    data.AddPriceHistory(itemId, means)
 end
 merc.SetEventHandler("COMMODITY_SEARCH_RESULTS_UPDATED", merc.CommodityResultsEvent)

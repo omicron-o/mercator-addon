@@ -14,6 +14,7 @@
 -- You should have received a copy of the GNU General Public License along with
 -- Mercator. If not, see <https://www.gnu.org/licenses/>.
 local merc = select(2, ...)
+local data = merc.data
 
 -- TODO: Explore when to do these scans. Seems a scan takes about 0.002 seconds
 -- so it's not terrible for performance but maybe we don't want to run this that
@@ -27,10 +28,10 @@ local merc = select(2, ...)
 function merc.BagsUpdated()
     local start = GetTimePreciseSec()
     local inventory = merc.ScanBags()
-    merc.UpdateCharacterInventory(inventory)
+    data.UpdateCharacterInventory(inventory)
     if BankFrame:IsShown() then
         local bank = merc.ScanBank()
-        merc.UpdateCharacterBank(bank)
+        data.UpdateCharacterBank(bank)
     end
     local stop = GetTimePreciseSec()
 end
@@ -39,7 +40,7 @@ merc.SetEventHandler("BAG_UPDATE_DELAYED", merc.BagsUpdated)
 function merc.BankOpened(frameType)
     if frameType == 8 then
         local bank = merc.ScanBank()
-        merc.UpdateCharacterBank(bank)
+        data.UpdateCharacterBank(bank)
     end
 end
 merc.SetEventHandler("PLAYER_INTERACTION_MANAGER_FRAME_SHOW", merc.BankOpened)
@@ -78,3 +79,9 @@ function merc.ScanBagById(bagId, items)
         end
     end
 end
+
+function merc.MoneyChanged()
+    data.AddCharacterCopperHistory(GetMoney())
+end
+merc.SetEventHandler("PLAYER_MONEY", merc.MoneyChanged)
+merc.SetEventHandler("MERCATOR_FULLY_LOADED", merc.MoneyChanged)
