@@ -40,12 +40,7 @@ local items = {
 }
 
 
-function merc.StartItemCacheCheck(initialLogin, reloadUI)
-    if not initialLogin and not reloadUI then
-        return
-    end
-
-
+function merc.StartItemCacheCheck()
     print("Item cache check in 60 seconds.")
 
     local toScan = {}
@@ -57,7 +52,7 @@ function merc.StartItemCacheCheck(initialLogin, reloadUI)
         merc.StartCacheUpdate(toScan)
     end)
 end
-merc.SetEventHandler("PLAYER_ENTERING_WORLD", merc.StartItemCacheCheck)
+merc.SetEventHandler("MERCATOR_FULLY_LOADED", merc.StartItemCacheCheck)
 
 merc.ItemCacheState = {
     nextScan = 1,

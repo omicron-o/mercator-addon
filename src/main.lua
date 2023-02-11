@@ -47,7 +47,9 @@ end
 function merc.SetupEvents()
     local frame = CreateFrame("Frame")
     for name, _ in pairs(merc.events) do
-        frame:RegisterEvent(name)
+        if string.sub(name, 1, string.len("MERCATOR")) ~= "MERCATOR" then
+            frame:RegisterEvent(name)
+        end
     end
     frame:SetScript("OnEvent", merc.MainEventHandler)
 end
@@ -64,6 +66,15 @@ function merc.OnAddonLoaded(name)
     print("Loaded", AddonName)
 end
 merc.SetEventHandler("ADDON_LOADED", merc.OnAddonLoaded)
+
+-- Fire custom event MERCATOR_FULLY_LOADED. This event is fired when the player
+-- enters the world for the first time after logging in or reloading UI.
+function merc.FireFullyLoadedEvent(initialLogin, reloadUI)
+    if initialLogin or reloadUI then
+        merc.MainEventHandler(nil, "MERCATOR_FULLY_LOADED")
+    end
+end
+merc.SetEventHandler("PLAYER_ENTERING_WORLD", merc.FireFullyLoadedEvent)
 
 function merc.SlashCommand(args)
     if args == "scan" then
