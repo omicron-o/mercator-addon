@@ -240,9 +240,6 @@ function data.GetItemCountPerCharacter(itemId)
         if chardb.bank[itemIdStr] ~= nil then
             counts[character] = counts[character] + chardb.bank[itemIdStr]
         end
-        if chardb.reagents[itemIdStr] ~= nil then
-            counts[character] = counts[character] + chardb.reagents[itemIdStr]
-        end
         if counts[character] == 0 then
             counts[character] = nil
         end
