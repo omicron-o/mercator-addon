@@ -38,8 +38,6 @@ function merc.MainEventHandler(frame, event, ...)
         for i, handler in ipairs(handlers) do
             handler(...)
         end
-    else
-        error("Unhandled event", event)
     end
 end
 
@@ -63,6 +61,7 @@ function merc.OnAddonLoaded(name)
     end
     merc.db = MercatorDB
     merc.data.UpdateDB()
+    merc.MainEventHandler(nil, "MERCATOR_LOADING")
     print("Loaded", AddonName)
 end
 merc.SetEventHandler("ADDON_LOADED", merc.OnAddonLoaded)
