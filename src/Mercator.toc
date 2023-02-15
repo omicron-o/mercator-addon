@@ -4,7 +4,10 @@
 ## SavedVariables: MercatorDB
 
 main.lua
+
 util/time.lua
+util/string.lua
+
 data.lua
 characterscan.lua
 auctionscan.lua
