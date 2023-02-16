@@ -111,7 +111,7 @@ function cli.PrintLn(...)
         cli.outText:Insert(tostring(select(1, ...)))
         for i = 2, n do
             cli.outText:Insert(" ")
-            cli.outText:Insert(tostring(select(2, ...)))
+            cli.outText:Insert(tostring(select(i, ...)))
         end
     end
     cli.outText:Insert("\n")
