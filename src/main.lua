@@ -76,11 +76,7 @@ end
 merc.SetEventHandler("PLAYER_ENTERING_WORLD", merc.FireFullyLoadedEvent)
 
 function merc.SlashCommand(args)
-    if args == "scan" then
-        merc.AuctionScanCommand()
-    else
-        print("Mercator: unknown command")
-    end
+    merc.cli.ToggleShow()
 end
 
 function merc.SetupSlashCommands()

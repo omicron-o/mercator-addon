@@ -13,4 +13,8 @@ characterscan.lua
 auctionscan.lua
 itemcache.lua
 tooltip.lua
+
+cli.lua
+commands.lua
+
 init.lua
