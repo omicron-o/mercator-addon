@@ -57,6 +57,33 @@ function str.Strip(s)
     return s:gsub("^%s+", ""):gsub("%s+$", "")
 end
 
+-- Parse a string into a list
+-- all chunks will match the given pattern
+-- if pattern is nil the pattern defaults "%S+", which will split along spaces
+function str.Split(s, pattern)
+    if pattern == nil then
+        pattern = "%S+"
+    end
+    local t = {}
+    for chunk in s:gmatch(pattern) do
+        table.insert(t, chunk)
+    end
+    return t
+end
+
+-- Join a list with a given delimiter
+function str.Join(delim, list)
+    if #list == 0 then
+        return ""
+    end
+
+    local output = tostring(list[1])
+    for i = 2,#list do
+        output = output .. delim .. tostring(list[i])
+    end
+    return output
+end
+
 -- Format money
 -- copper: the integer number of copper to format.
 -- width: the minimum number of characters to output. This may be omitted)
