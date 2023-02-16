@@ -15,7 +15,6 @@
 -- Mercator. If not, see <https://www.gnu.org/licenses/>. 
 local AddonName, merc = ...
 
-
 local items = {
     cloth = {
         192095,
@@ -41,8 +40,6 @@ local items = {
 
 
 function merc.StartItemCacheCheck()
-    print("Item cache check in 60 seconds.")
-
     local toScan = {}
     for itemId, _ in pairs(merc.commodities) do
         table.insert(toScan, tonumber(itemId))
@@ -214,12 +211,13 @@ function merc.FinishCacheScan()
     local scan, scanId = EnsureCacheScanStage("finishing")
     scan.completed = GetServerTime()
 
-    print("Completed scan with id", scanId, "after", scan.completed - scan.created)
-    print(" All ids:", #scan.itemIds)
-    print(" Requested:", scan.requested)
-    print(" Received:", scan.received)
-    print(" failed:", scan.failed)
-    print(" invalid:", scan.invalid)
+    local cli = merc.cli
+    cli.PrintLn("|cFFFFAC4ADebug:|r Completed cache update scan with id", scanId, "after", scan.completed - scan.created)
+    cli.PrintLn("|cFFFFAC4ADebug:|r   All ids:", #scan.itemIds)
+    cli.PrintLn("|cFFFFAC4ADebug:|r   Requested:", scan.requested)
+    cli.PrintLn("|cFFFFAC4ADebug:|r   Received:", scan.received)
+    cli.PrintLn("|cFFFFAC4ADebug:|r   failed:", scan.failed)
+    cli.PrintLn("|cFFFFAC4ADebug:|r   invalid:", scan.invalid)
 
     -- TODO: deal with failed/invalid items
     
