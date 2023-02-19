@@ -96,6 +96,9 @@ function data.UpdateDB()
     if merc.db.prices.history == nil then
         merc.db.prices.history = {}
     end
+    if merc.db.options == nil then
+        merc.db.options = {}
+    end
 
     -- Temporary
     if merc.db.prices.historical ~= nil then
@@ -276,4 +279,12 @@ function data.GetCopperPerCharacter()
         end
     end
     return copper
+end
+
+function data.SetOption(name, value)
+    merc.db.options[name] = value
+end
+
+function data.GetOption(name, default)
+    return merc.db.options[name] or default
 end
