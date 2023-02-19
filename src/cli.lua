@@ -23,6 +23,9 @@ local HasPrefix = merc.util.string.HasPrefix
 cli.commands = {}
 local commands = cli.commands
 
+cli.history = {}
+cli.historyIndex = 0
+
 cli.fontFiles = {
     ["inconsolata"] = {
         ["bold"]     = "Interface\\AddOns\\Mercator\\media\\fonts\\inconsolata\\Inconsolata-Bold.ttf",
@@ -115,12 +118,17 @@ function cli.CreateUI()
     cli.inText:SetScript("OnEnterPressed", function(self)
         cli.HandleCLIEnter()
     end)
+
+    cli.inText:SetScript("OnArrowPressed", function(self, key)
+        cli.OnArrowPressed(key)
+    end)
 end
 merc.SetEventHandler("MERCATOR_LOADING", cli.CreateUI)
 
 function cli.HandleCLIEnter()
     local input = cli.inText:GetText()
     cli.PrintLn("|cFF009900>|r", input)
+    cli.AddHistoryLine(input)
     cli.inText:SetText("") 
     input = Strip(input)
     if input ~= "" and not HasPrefix(input, '#') then
@@ -147,6 +155,51 @@ end
 
 function cli.AddLine(line)
     cli.outText(line)
+end
+
+function cli.RemoveHistoryDuplicate(line)
+    -- We assume only 1 duplicate can exist
+    local found = nil
+    for i, historyLine in ipairs(cli.history) do
+        if line == historyLine then
+            found = i
+            break
+        end
+    end
+    if found then
+        table.remove(cli.history, found)
+    end
+end
+
+function cli.AddHistoryLine(line)
+    cli.RemoveHistoryDuplicate(line)
+    table.insert(cli.history, 1, line)
+    cli.historyIndex = 0
+    while #cli.history > 30 do
+        table.remove(cli.history)
+    end
+end
+
+function cli.OnArrowPressed(key)
+    local direction
+    if key == "UP" then
+        direction = 1
+    elseif key == "DOWN" then
+        direction = -1
+    else
+        return
+    end
+
+    local newIndex = cli.historyIndex + direction
+    if newIndex > 0 and newIndex <= #cli.history then
+        cli.historyIndex = newIndex
+        cli.inText:SetText(cli.history[newIndex])
+    elseif newIndex == 0 then
+        -- TODO: maybe remember current line? but have to consider how that works
+        -- if you up arrow a few times, edit some text, then arrow again
+        cli.historyIndex = newIndex
+        cli.inText:SetText("")
+    end
 end
 
 function cli.SplitCommand(input)

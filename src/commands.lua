@@ -76,6 +76,15 @@ cli.RegisterCommand("commands", {
     end)
 })
 
+cli.RegisterCommand("history", {
+    description="print the command history",
+    command = (function()
+        for i=#cli.history, 1, -1 do
+            cli.Printf("%2i: %s\n", i, cli.history[i])
+        end
+    end)
+})
+
 local gold = {description="display gold for all characters"}
 function gold.command()
     local copperPerChar = data.GetCopperPerCharacter()
