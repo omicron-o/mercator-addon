@@ -2,6 +2,7 @@
 ## Title: Mercator
 ## Notes: Trading and crafting data and calculation
 ## SavedVariables: MercatorDB
+## Version: 0.2.0-alpha
 
 main.lua
 

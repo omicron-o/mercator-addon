@@ -18,6 +18,7 @@ build: clean
 	#cp -r $(MEDIA_DIR)/textures/*.tga $(BUILD_DIR)/Mercator/textures/
 	cp -r $(MEDIA_DIR)/fonts $(BUILD_DIR)/Mercator/media/fonts
 	cp LICENSE.md $(BUILD_DIR)/Mercator/
+	cp CHANGELOG.md $(BUILD_DIR)/Mercator/
 
 release-zip: release
 	7z a -tzip $(RELEASE_DIR)/mercator.zip -w $(BUILD_DIR)/.
