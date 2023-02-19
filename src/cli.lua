@@ -23,11 +23,31 @@ local HasPrefix = merc.util.string.HasPrefix
 cli.commands = {}
 local commands = cli.commands
 
+cli.fontFiles = {
+    ["inconsolata"] = {
+        ["bold"]     = "Interface\\AddOns\\Mercator\\media\\fonts\\inconsolata\\Inconsolata-Bold.ttf",
+        ["semibold"] = "Interface\\AddOns\\Mercator\\media\\fonts\\inconsolata\\Inconsolata-SemiBold.ttf",
+        ["regular"]  = "Interface\\AddOns\\Mercator\\media\\fonts\\inconsolata\\Inconsolata-Regular.ttf"
+    },
+    ["freefont"] = {
+        ["mono-bold"] = "Interface\\AddOns\\Mercator\\media\\fonts\\freefont\\FreeMonoBold.otf",
+        ["mono"]      = "Interface\\AddOns\\Mercator\\media\\fonts\\freefont\\FreeMono.otf",
+    }
+}
+
 function cli.RegisterCommand(name, command)
     if commands[name] ~= nil then
         error("Command already registered")
     end
     commands[name] = command
+end
+
+function cli.SetFont(font, variant, size)
+    local file = cli.fontFiles[font][variant]
+
+    local inRet = cli.inText:SetFont(file, size, "OUTLINE")
+    local outRet = cli.outText:SetFont(file, size, "OUTLINE")
+    return inRet and outRet
 end
 
 function cli.CreateUI()
@@ -63,7 +83,6 @@ function cli.CreateUI()
     cli.outText:SetWidth(640-16-20)
     cli.outText:SetMultiLine(true)
     cli.outText:SetAutoFocus(false)
-    cli.outText:SetFont("Interface\\AddOns\\Mercator\\media\\InconsolataGo-Bold.ttf", 14, "OUTLINE")
     scrollFrame:SetScrollChild(cli.outText)
 
 
@@ -82,8 +101,12 @@ function cli.CreateUI()
     cli.inText:SetPoint("TOPLEFT", inputWrap, "TOPLEFT", 8, -8)
     cli.inText:SetPoint("BOTTOMRIGHT", inputWrap, "BOTTOMRIGHT", -8, 8)
     cli.inText:SetMultiLine(false)
-    cli.inText:SetFont("Interface\\AddOns\\Mercator\\media\\InconsolataGo-Bold.ttf", 14, "OUTLINE")
     cli.inText:SetAutoFocus(false)
+    
+    local font = data.GetOption("cli.font.name", "inconsolata")
+    local variant = data.GetOption("cli.font.variant", "bold")
+    local size = data.GetOption("cli.font.size", 14)
+    cli.SetFont(font, variant, size)
 
     cli.inText:SetScript("OnEscapePressed", function(self) 
         cli.Hide()
@@ -132,7 +155,7 @@ function cli.SplitCommand(input)
     -- TODO: we probably want smarter splitting
     for word in input:gmatch("%S+") do
         if command then
-            arguments.insert(word)
+            table.insert(arguments, word)
         else
             command = word
         end

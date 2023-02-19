@@ -16,7 +16,7 @@ build: clean
 	cp -r $(SRC_DIR) $(BUILD_DIR)/Mercator
 	mkdir -p $(BUILD_DIR)/Mercator/media/textures
 	#cp -r $(MEDIA_DIR)/textures/*.tga $(BUILD_DIR)/Mercator/textures/
-	cp -r $(MEDIA_DIR)/fonts $(BUILD_DIR)/Mercator/fonts
+	cp -r $(MEDIA_DIR)/fonts $(BUILD_DIR)/Mercator/media/fonts
 	cp LICENSE.md $(BUILD_DIR)/Mercator/
 
 release-zip: release
