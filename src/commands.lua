@@ -19,6 +19,13 @@ cli.RegisterCommand("clear", {
     end)
 })
 
+cli.RegisterCommand("exit", {
+    description="exit the cli",
+    command=(function(...)
+        cli.Hide()
+    end)
+})
+
 
 -- Finds the nearest point in the past that is aligned to a boundary
 -- the boundary depends on the interval time unit
