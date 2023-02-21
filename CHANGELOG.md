@@ -1,3 +1,7 @@
+# Mercator v0.3.0-alpha
+ - Add gold-history command to show account gold history
+ - Keybind now focuses cli if already visible
+
 # Mercator v0.2.0-alpha
  - Add command line interface
  - Track all your character's gold history
