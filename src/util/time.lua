@@ -54,3 +54,39 @@ function time.FormatDuration(t)
         return "long ago"
     end
 end
+
+
+-- Take a string like "1M" or "3w" or "30m" and turn it into a number of
+-- seconds.
+-- Allowed suffixes are:
+-- M    Month  (60*60*24*30 seconds)
+-- w    week   (60*60*24*7  seconds)
+-- d    day    (60*60*24    seconds)
+-- h    hour   (60*60       seconds)
+-- h    minute (60          seconds)
+-- s    second (1           seconds)
+function time.ParseDuration(s)
+    -- TODO: probably allow complex durations such as 1w4d6h
+    local duration, unit = string.match(s, "^(%d+)([Mwdhms])$")
+    if duration == nil or unit == nil then
+        return nil
+    end
+    duration = tonumber(duration)
+    if unit == "M" then
+        -- all months are 30 days
+        duration = duration * 3600 * 24 * 30
+    elseif unit == "w" then
+        duration = duration * 3600 * 24 * 7
+    elseif unit == "d" then
+        duration = duration * 3600 * 24
+    elseif unit == "h" then
+        duration = duration * 3600
+    elseif unit == "m" then
+        duration = duration * 60
+    elseif unit == "s" then
+        -- duration = duration
+    else
+        return nil
+    end
+    return duration
+end
