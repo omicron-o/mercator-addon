@@ -281,6 +281,31 @@ function data.GetCopperPerCharacter()
     return copper
 end
 
+-- Helper function to grab copper from specific character at specific time
+local function GetCopperHistoryFromCharDb(chardb, ts)
+    local copper = 0
+    -- TODO: should be able to do binary search on this instead to reduce
+    -- the time complexity from linear to logarithmic.
+    for _, entry in pairs(chardb.copper) do
+        if entry.ts <= ts then
+            copper = entry.copper
+        else
+            break
+        end
+    end
+    return copper
+end
+
+-- Get total copper on a specific timestamp
+function data.GetCopperHistory(ts)
+    local total = 0
+    for character, chardb in pairs(merc.db.characters) do
+        EnsureCharacterDBStructure(chardb)
+        total = total + GetCopperHistoryFromCharDb(chardb, ts)
+    end
+    return total
+end
+
 function data.SetOption(name, value)
     merc.db.options[name] = value
 end
