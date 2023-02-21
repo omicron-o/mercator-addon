@@ -2,6 +2,8 @@ local merc = select(2, ...)
 local cli = merc.cli
 local data = merc.data
 local FormatMoney = merc.util.string.FormatMoney
+local FormatInt = merc.util.string.FormatInt
+local ParseDuration = merc.util.time.ParseDuration
 
 cli.RegisterCommand("reload", {
     description="reloads the ui",
@@ -14,6 +16,90 @@ cli.RegisterCommand("clear", {
     description="clears the output window",
     command=(function(...)
         cli.outText:SetText("")
+    end)
+})
+
+
+-- Finds the nearest point in the past that is aligned to a boundary
+-- the boundary depends on the interval time unit
+local function GetAlignedTime(interval)
+    local now = GetServerTime()
+    local duration, unit = string.match(interval, "^(%d+)([Mwdhms])$")
+    
+    if unit == "w" then
+        local dayOfTheWeek = tonumber(date("%u", now))
+        -- Remove some 24 hour periods from now to land on the start of the week
+        -- this may be a little jank in some edge cases
+        now = now - (dayOfTheWeek - 1)*24*3600
+    end
+    
+    local dt = {
+        year    = tonumber(date("%Y", now)),
+        month   = tonumber(date("%m", now)),
+        day     = tonumber(date("%d", now)),
+        hour    = tonumber(date("%H", now)),
+        min     = tonumber(date("%M", now)),
+        sec     = 0
+    }
+
+    if unit == "y" then
+        dt.month = 1
+        dt.day = 1
+        dt.min = 0
+        dt.hour = 0
+    elseif unit == "M" then
+        dt.day = 1
+        dt.min = 0
+        dt.hour = 0
+    elseif unit == "w" or unit == "d" then
+        dt.min = 0
+        dt.hour = 0
+    elseif unit == "h" then
+        dt.min = 0
+    end
+    return time(dt)
+end
+
+
+cli.RegisterCommand("gold-history", {
+    description="print gold history",
+    command=(function(interval, count)
+        local intervalSec
+        if interval ~= nil then
+            intervalSec = ParseDuration(interval)
+        end
+        if count == nil then
+            count = 1
+        else
+            count = tonumber(count)
+        end
+        if intervalSec == nil or count == nil then
+            cli.PrintLn("Usage: gold-history <interval> [count]")
+            cli.PrintLn("   interval: a duration like 1M (1 month) or 1w (1 week) or 3d (3 days)")
+            cli.PrintLn("   count:    how many intervals are printed")
+            return
+        end
+        
+        local now = GetServerTime()
+        local start = GetAlignedTime(interval)
+        local previous = nil
+        local timestamps = {}
+        for i = count, 0, -1 do
+            local ts = start - intervalSec*i
+            table.insert(timestamps, ts)
+        end
+        table.insert(timestamps, now)
+
+        for _, ts in ipairs(timestamps) do
+            local copper = data.GetCopperHistory(ts)
+            local diff = ""
+            if previous ~= nil then
+                diff = FormatMoney(copper - previous, 10, true, true)
+            end
+            local timeStr = date("%Y-%m-%d %H:%M", ts)
+            cli.Printf("%-20s %s %s\n", timeStr, FormatMoney(copper, 10, true), diff)
+            previous = copper
+        end
     end)
 })
 
