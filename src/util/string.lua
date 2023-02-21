@@ -87,22 +87,44 @@ end
 -- Format money
 -- copper: the integer number of copper to format.
 -- width: the minimum number of characters to output. This may be omitted)
-function str.FormatMoney(copper, width)
-    local gold = math.floor(copper / 10000)
-    local silver = math.floor((copper - gold*10000)/100)
-    local copper = copper - gold*10000 - silver*100
+-- short: only format gold values and ignore silver/copper if set to true
+-- color: make values red on green if the sign is positive or negative
+function str.FormatMoney(copper, width, short, color)
+    local sign = copper < 0 and -1 or 1
+    local inCopper = copper
+    copper = math.abs(copper)
+
+    if color and sign == -1 then
+        color = "|cFFAA0000" -- red
+    elseif color and sign == 1 then
+        color = "|cFF00AA00" -- green
+    end
 
     local goldSep   = "|cFFFFD700G|r"
     local silverSep = "|cFFC9C0BBS|r"
     local copperSep = "|cFFDA8A67C|r"
     
-    gold = str.FormatInt(gold)
-    -- Len of gold + 3 separators + 4 digits + 2 spaces
-    local len = string.len(gold) + 9
+    local gold = math.floor(copper / 10000)
+    local silver = math.floor((copper - gold*10000)/100)
+    local copper = copper - gold*10000 - silver*100
+    
+    gold = str.FormatInt(sign*gold)
+    -- the length for everything behind the gold number
+    -- full format:  3 letters + 2 spaces + 2 digits
+    -- short format: 1 letter
+    local extraLen = short and 1 or 9 -- shitty ternary operator
+    local len = string.len(gold) + extraLen
     local pad = ""
     if len < width then
         pad = string.rep(" ", width - len)
     end
-    local fmt = "%s%s%s %02d%s %02d%s"
-    return string.format(fmt, pad, gold, goldSep, silver, silverSep, copper, copperSep)
+
+    local fmt = short and "%s%s%s" or "%s%s%s %02d%s %02d%s" -- shitty ternary operator
+    local out = string.format(fmt, pad, gold, goldSep, silver, silverSep, copper, copperSep)
+
+    if color and inCopper ~= 0 then
+        return color .. out .. "|r"
+    else
+        return out
+    end
 end
