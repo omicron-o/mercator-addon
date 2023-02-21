@@ -76,6 +76,12 @@ function cli.CreateUI()
         cli.OnShow()
     end)
 
+    -- TODO: place this here to make it visible to the keybind handler in
+    -- Bindings.xml but we probably need a cleaner way for this
+    cli.frame.ShowOrFocus = function()
+        cli.ShowOrFocus()
+    end
+
     local scrollFrame = CreateFrame("ScrollFrame", nil, cli.frame, "UIPanelScrollFrameTemplate")
     scrollFrame:SetSize(640-16-20, 480-16)
     scrollFrame:SetPoint("TOPLEFT", cli.frame, "TOPLEFT", 8, -8)
@@ -240,6 +246,14 @@ end
 
 function cli.Show()
     cli.frame:Show()
+end
+
+function cli.ShowOrFocus()
+    if cli.frame:IsShown() then
+        cli.inText:SetFocus()
+    else
+        cli.frame:Show()
+    end
 end
 
 function cli.ToggleShow()

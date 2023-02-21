@@ -1,5 +1,5 @@
 <Bindings>
     <Binding name="Show CLI" category="Mercator" default="CTRL-Z">
-        MercatorCLI:Show()
+        MercatorCLI.ShowOrFocus()
     </Binding>
 </Bindings>
