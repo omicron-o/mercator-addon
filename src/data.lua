@@ -203,12 +203,21 @@ local function EnsureCharacterDBStructure(chardb)
     if chardb.copper == nil then
         chardb.copper = {}
     end
+    if chardb.completedQuests == nil then
+        chardb.completedQuests = {}
+    end
+    if chardb.skills == nil then
+        chardb.skills = {}
+    end
 end
 
 -- Grabs the database for this character based on charactername
-local function GetCharacterDB()
-    local name, server = UnitFullName("player")
-    local character = string.format("%s-%s", name, server)
+local function GetCharacterDB(character)
+    if character == nil then
+        local name, server = UnitFullName("player")
+        character = string.format("%s-%s", name, server)
+    end
+
     if merc.db.characters[character] == nil then
         merc.db.characters[character] = {}
     end
@@ -312,4 +321,54 @@ end
 
 function data.GetOption(name, default)
     return merc.db.options[name] or default
+end
+
+function data.GetKnownCharacters()
+    local characters = {}
+    for name, _ in pairs(merc.db.characters) do
+        table.insert(characters, name)
+    end
+    return characters
+end
+
+function data.UpdateCharacterSkills(skills)
+    local chardb = GetCharacterDB()
+    chardb.skills = skills
+end
+
+function data.GetCharacterSkillById(id, character)
+    local chardb = GetCharacterDB(character)
+    return chardb.skills[id] or 0
+end
+
+function data.GetCharacterSkills(character)
+    local chardb = GetCharacterDB(character)
+    return chardb.skills
+end
+
+-- Saves a quest as completed. quest is a quest id, reset is either "daily",
+-- "weekly" or "never"
+-- TODO: figure out how to deal with darkmoon faire quests that reset not on a
+-- weekly point
+function data.SetCharacterQuestCompleted(quest, reset)
+    local now = GetServerTime()
+    if reset == "daily" then
+        reset = now + C_DateAndTime.GetSecondsUntilDailyReset()
+    elseif reset == "weekly" then
+        reset = now + C_DateAndTime.GetSecondsUntilWeeklyReset()
+    elseif reset == "never" then
+        reset = tonumber("+inf")
+    else
+        error("Invalid reset")
+    end
+    
+    local chardb = GetCharacterDB()
+    chardb.completedQuests[tostring(quest)] = reset
+end
+
+function data.IsCharacterQuestCompleted(quest, character)
+    local now = GetServerTime()
+    local chardb = GetCharacterDB(character)
+    local reset = chardb.completedQuests[tostring(quest)]
+    return reset ~= nil and now < reset
 end
