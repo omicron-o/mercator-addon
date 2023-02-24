@@ -26,6 +26,22 @@ cli.RegisterCommand("exit", {
     end)
 })
 
+cli.RegisterCommand("professions", {
+    description="show all professions for all characters",
+    command=(function(...)
+        local chars = data.GetKnownCharacters()
+        for _, name in ipairs(chars) do
+            local skills = data.GetCharacterSkills(name)
+            if next(skills) ~= nil then
+                cli.PrintLn(name)
+            end
+            for skillId, level in pairs(skills) do
+                local info = C_TradeSkillUI.GetProfessionInfoBySkillLineID(skillId)
+                cli.Printf(" - %3d %s\n", level, info.professionName)
+            end
+        end
+    end)
+})
 
 -- Finds the nearest point in the past that is aligned to a boundary
 -- the boundary depends on the interval time unit
