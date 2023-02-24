@@ -15,6 +15,7 @@
 -- Mercator. If not, see <https://www.gnu.org/licenses/>.
 local merc = select(2, ...)
 local data = merc.data
+local enums = merc.enums
 
 -- TODO: Explore when to do these scans. Seems a scan takes about 0.002 seconds
 -- so it's not terrible for performance but maybe we don't want to run this that
@@ -85,3 +86,29 @@ function merc.MoneyChanged()
 end
 merc.SetEventHandler("PLAYER_MONEY", merc.MoneyChanged)
 merc.SetEventHandler("MERCATOR_FULLY_LOADED", merc.MoneyChanged)
+
+-- TODO: The required info see to not always be available when the SKILL_LINES_CHANGED
+-- event fires (at least not the one where your character loads first).
+-- Investigate if there is a better way to make this work besides also
+-- triggering on TRADE_SKILL_LIST_UPDATE event
+function merc.SkillLinesChanged()
+    local skills = {}
+    for _, skillId in pairs(enums.skillIds) do
+        local info = C_TradeSkillUI.GetProfessionInfoBySkillLineID(skillId)
+        if info.skillLevel >= 1 then
+            merc.cli.DebugLn(info.skillLevel, info.maxSkillLevel, info.professionName)
+            skills[skillId] = info.skillLevel
+        end
+    end
+
+    -- Since the skill info isn't always available we'll assume it's not a valid
+    -- update if we found 0 skills. Operating under the assumption that if one
+    -- skill is found, all of them are going to be found. This may prove to be
+    -- false.
+    if next(skills) ~= nil then
+        data.UpdateCharacterSkills(skills)
+    end
+end
+merc.SetEventHandler("SKILL_LINES_CHANGED", merc.SkillLinesChanged)
+merc.SetEventHandler("TRADE_SKILL_LIST_UPDATE", merc.SkillLinesChanged)
+

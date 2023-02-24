@@ -9,6 +9,7 @@ main.lua
 util/time.lua
 util/string.lua
 
+enums.lua
 data.lua
 characterscan.lua
 auctionscan.lua
