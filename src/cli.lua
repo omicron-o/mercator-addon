@@ -154,9 +154,17 @@ function cli.PrintLn(...)
     cli.outText:Insert("\n")
 end
 
+function cli.DebugLn(...)
+    cli.PrintLn("|cFFFFAC4ADebug:|r", ...)
+end
+
 function cli.Printf(fmt, ...)
     local s = string.format(fmt, ...)
     cli.outText:Insert(s)
+end
+
+function cli.Debugf(fmt, ...)
+    cli.Printf("|cFFFFAC4ADebug:|r " .. fmt, ...)
 end
 
 function cli.AddLine(line)
