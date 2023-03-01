@@ -1,3 +1,11 @@
+# Mercator v0.4.0-alpha
+ - add exit command to close the command window
+ - add system to track track professions of each character (only dragonflight for now)
+ - add system to track completed quests of each character
+ - add a professions command to list professions of your characters
+ - add todo command to show some weekly profession related activities on all
+   characters
+
 # Mercator v0.3.0-alpha
  - Add gold-history command to show account gold history
  - Keybind now focuses cli if already visible
