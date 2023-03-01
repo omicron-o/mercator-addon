@@ -15,6 +15,7 @@ characterscan.lua
 auctionscan.lua
 itemcache.lua
 tooltip.lua
+weekly.lua
 
 cli.lua
 commands.lua

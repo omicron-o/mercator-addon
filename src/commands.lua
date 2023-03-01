@@ -4,6 +4,7 @@ local data = merc.data
 local FormatMoney = merc.util.string.FormatMoney
 local FormatInt = merc.util.string.FormatInt
 local ParseDuration = merc.util.time.ParseDuration
+local weekly = merc.weekly
 
 cli.RegisterCommand("reload", {
     description="reloads the ui",
@@ -23,6 +24,44 @@ cli.RegisterCommand("exit", {
     description="exit the cli",
     command=(function(...)
         cli.Hide()
+    end)
+})
+
+function todoTasks(character)
+    local tasks = {}
+    for _, questInfo in ipairs(weekly.quests) do
+        if weekly.ShouldComplete(questInfo, character) then
+            table.insert(tasks, questInfo)
+        end
+    end
+    return tasks
+end
+
+cli.RegisterCommand("todo", {
+    description = "Show (periodic) profession tasks your characters need to complete",
+    command=(function()
+        local chars = data.GetKnownCharacters()
+        for _, character in ipairs(chars) do
+            local category
+            local tasks = todoTasks(character)
+            if next(tasks) ~= nil then
+                cli.PrintLn(character)
+            end
+
+            for _, questInfo in ipairs(tasks) do
+                local min, max = weekly.CheckStatus(questInfo, character)
+                if min >= max then
+                    color = "|cFF00AA00" -- green
+                else
+                    color = "|cFFAA0000" -- red
+                end
+                if category ~= questInfo.category then
+                    cli.Printf("  %s\n", questInfo.category)
+                    category = questInfo.category
+                end
+                cli.Printf("    - %s%d/%d|r %s\n", color, min, max, questInfo.name)
+            end
+        end
     end)
 })
 
